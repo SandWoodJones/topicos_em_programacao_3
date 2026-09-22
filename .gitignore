@@ -1,0 +1,17 @@
+.direnv/
+.claude/settings.local.json
+
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.pdf
+
+# Beamer
+*.nav
+*.snm
+*.vrb
