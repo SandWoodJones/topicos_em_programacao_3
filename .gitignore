@@ -10,6 +10,7 @@
 *.synctex.gz
 *.toc
 *.pdf
+!images/*.pdf
 
 # Beamer
 *.nav

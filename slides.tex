@@ -1,22 +1,40 @@
 \documentclass{beamer}
 \usepackage[T1]{fontenc}
 \usepackage[brazilian]{babel}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+
+\newcommand{\en}[1]{\foreignlanguage{english}{\emph{#1}}}
+\newcommand{\termo}[1]{\alert{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \title{Nix/NixOS}
 \author{Raul Rodrigues de Oliveira}
 \date{\today}
 \usetheme{Madrid}
+\setbeamertemplate{navigation symbols}{}
 
 \begin{document}
 
 \frame{\titlepage}
 
 \begin{frame}{O que é Nix?}
-	\begin{itemize}
-		\item Nix é uma DSL (\foreignlanguage{english}{\emph{Domain Specific Language}}) puramente funcional, usada para definir pacotes utilizados pelo gerenciador de pacotes.
-		\item Nix também é um gerenciador de pacotes que utiliza um mecanismo de \emph{hashing} para instalar pacotes em diretórios únicos e imutáveis
-		\item NixOS é uma distribuição do sistema operacional Linux
-	\end{itemize}
+	\begin{columns}[c,onlytextwidth]
+		\begin{column}{0.54\textwidth}
+			\small\raggedright
+			Nix é uma DSL (\en{Domain Specific Language}) puramente funcional, usada para declarar \termo{derivações}: instruções precisas de como arquivos existentes são usados para derivar novos arquivos.
+
+			\medskip
+			Nix também é o gerenciador de pacotes que realiza essas derivações, produzindo resultados concretos (um programa, uma biblioteca, um script de shell, uma imagem baixada da internet). Cada resultado é instalado, via \en{hashing}, em um diretório único e imutável.
+
+			\medskip
+			NixOS é uma distribuição Linux que leva o conceito de Nix à sua conclusão lógica: um sistema operacional configurado declarativamente com Nix, desde os pacotes instalados, até os serviços executados, regras de firewall, ambiente de desktop, etc.
+		\end{column}
+		\begin{column}{0.46\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{trinity}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \end{document}

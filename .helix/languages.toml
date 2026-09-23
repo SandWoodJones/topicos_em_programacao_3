@@ -1,22 +1,5 @@
 [language-server.ltex]
-command = "ltex-ls-plus"
-
-[language-server.ltex.config.ltex]
-language = "pt-BR"
-dictionary."pt-BR" = [
-  "Nix",
-  "NixOS",
-  "Nixpkgs",
-  "nixpkgs",
-  "DSL",
-  "declarativo",
-  "reprodutibilidade"
-]
-
-[language-server.ltex.config.ltex.latex.commands]
-"\\usetheme{}" = "ignore"
-"\\usecolortheme{}" = "ignore"
-"\\usepackage[]{}" = "ignore"
+command = "ltex-ls-wrapped"
 
 [[language]]
 name = "latex"
