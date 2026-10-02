@@ -38,7 +38,18 @@ let
 in
 pkgs.mkShell {
   packages = with pkgs; [
-    (texliveSmall.withPackages (ps: [ ps.latexmk ]))
+    (texliveSmall.withPackages (
+      ps: with ps; [
+        latexmk
+        biblatex
+        biber
+        biblatex-abnt
+        csquotes
+        logreq
+        fancyvrb
+      ]
+    ))
+    python3Packages.pygments
     texlab
     ltex-ls-wrapped
     zathura

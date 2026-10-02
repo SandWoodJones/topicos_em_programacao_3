@@ -10,6 +10,14 @@
 *.synctex.gz
 *.toc
 *.pdf
+*.pdl
+*.bcf
+*.blg
+*.bbl
+*.run.xml
+*-SAVE-ERROR
+code/*.nixtex
+
 !images/*.pdf
 
 # Beamer
