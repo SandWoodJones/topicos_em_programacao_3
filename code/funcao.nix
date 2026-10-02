@@ -1,11 +1,15 @@
 {
-	pkgs,
-	versao ? "1.0"
+  pkgs,
+  versao ? "1.0",
 }:
+let
+  mkNome = nome: "projeto-${nome}-${versao}";
+in
 {
-	nome = "meu-projeto";
-	compilador = pkgs.gcc;
+  # equivalente a `nome = "projeto-raul-${versao}"`;
+  nome = mkNome "raul";
+  compilador = pkgs.gcc;
 
-  # equivalente a `versao = versao';
-	inherit versao;
+  # equivalente a `versao = versao`;
+  inherit versao;
 }

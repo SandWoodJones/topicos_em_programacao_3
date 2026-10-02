@@ -46,7 +46,11 @@ pkgs.mkShell {
         biblatex-abnt
         csquotes
         logreq
-        fancyvrb
+        fvextra
+        tcolorbox
+        pgf
+        environ
+        etoolbox
       ]
     ))
     python3Packages.pygments

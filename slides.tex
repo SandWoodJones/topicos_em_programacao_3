@@ -2,16 +2,18 @@
 \usepackage[T1]{fontenc}
 \usepackage[brazilian]{babel}
 \usepackage{csquotes}
-\usepackage[backend=biber,style=abnt,accite]{biblatex}
+\usepackage[backend=biber,style=abnt,accite,extradate]{biblatex}
 \addbibresource{referencias.bib}
-\usepackage{listings}
-\usepackage{fancyvrb}
-\input{pygstyle.tex}
-\fvset{frame=single,framesep=4pt,fontsize=\scriptsize,tabsize=2,rulecolor=\color{black!30}}
+\defbibenvironment{bibliography}{\list{}{\setlength{\leftmargin}{\bibhang}\setlength{\itemindent}{-\leftmargin}\setlength{\itemsep}{0.5em}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}}}{\endlist}{\item}
 \renewcommand*{\bibfont}{\scriptsize}
-\setlength{\bibitemsep}{0.4em}
 \setbeamertemplate{bibliography item}{}
 \setbeamertemplate{frametitle continuation}[from second]
+\usepackage{fvextra}
+\usepackage{tcolorbox}
+\newtcolorbox{nixbox}[1]{colback=black!4,colframe=black!35,boxrule=0.4pt,arc=1pt,coltitle=white,colbacktitle=black!55,fonttitle=\ttfamily\scriptsize,title=#1,left=13pt,right=1pt,top=2pt,bottom=2pt,boxsep=1pt}
+\input{pygstyle.tex}
+\fvset{fontsize=\scriptsize,tabsize=2,numbers=left,numbersep=5pt,breaklines=true,breaksymbolleft={},breakindent=8pt}
+\renewcommand{\theFancyVerbLine}{\textcolor{black!45}{\tiny\arabic{FancyVerbLine}}}
 \usepackage{graphicx}
 \usepackage{caption}
 \captionsetup{font=small,labelsep=endash,justification=centering}
@@ -21,7 +23,7 @@
 \newcommand{\en}[1]{\foreignlanguage{english}{\emph{#1}}}
 \newcommand{\termo}[1]{\alert{#1}}
 \newcommand{\code}[1]{\texttt{#1}}
-\newcommand{\nixcode}[1]{\vspace*{3.3pt}\input{#1.nixtex}}
+\newcommand{\nixcode}[2]{\vspace*{3.3pt}\begin{nixbox}{#2}\input{#1.nixtex}\end{nixbox}}
 
 \title{Nix/NixOS}
 \author{Raul Rodrigues de Oliveira}
@@ -36,14 +38,14 @@
 \begin{frame}{O que é Nix?}
 	\begin{columns}[c,onlytextwidth]
 		\begin{column}{0.54\textwidth}
-			\small\raggedright
+			\footnotesize\raggedright
 			Nix é uma DSL (\en{Domain Specific Language}) usada para declarar \termo{derivações}: instruções precisas de como arquivos existentes são usados para derivar novos arquivos \cite{wikipedia-nix}.
 
 			\medskip
 			Nix também é o gerenciador de pacotes que realiza essas derivações, produzindo resultados concretos (um programa, uma biblioteca, um script de shell, uma imagem baixada da internet). Cada resultado é instalado, via \en{hashing}, em um diretório único e imutável \cite{wikipedia-nix}.
 
 			\medskip
-			NixOS é uma distribuição Linux que leva o conceito de Nix à sua conclusão lógica: um sistema operacional configurado declarativamente com Nix, desde os pacotes instalados, até os serviços executados, regras de firewall, ambiente de desktop, etc.
+			NixOS é uma distribuição Linux que leva o conceito de Nix à sua conclusão lógica: um sistema operacional configurado declarativamente com Nix, desde os pacotes instalados, até os serviços executados, regras de firewall, ambiente de desktop, etc \cite{wikipedia-nixos}.
 		\end{column}
 
 		\begin{column}{0.46\textwidth}
@@ -62,10 +64,11 @@
 \end{frame}
 
 \begin{frame}{A linguagem}
-	Nix é caracterizada por \cite{nixdev-language}
+	\small
+	Nix é uma linguagem de domínio específico, puramente funcional, de avaliação preguiçosa e tipagem dinâmica \cite{nixdev-language}
 
 	\begin{description}
-		\item[Puramente funcional] um paradigma de programação que trata toda a computação como a avaliação de funções matemáticas, ou seja, funções dependem apenas dos seus argumentos independente de um estado global ou local \cite{wikipedia-functional}. Desta forma, passar uma mesma entrada sempre resulta na mesma saída o que garante determinismo e permite as derivações de serem hasheadas.
+		\item[Puramente funcional] um paradigma de programação que trata toda a computação como a avaliação de funções matemáticas, ou seja, funções dependem apenas dos seus argumentos independente de um estado global ou local \cite{wikipedia-functional}. Desta forma, passar uma mesma entrada sempre resulta na mesma saída o que garante determinismo e permite que as derivações sejam hasheadas.
 		\item[Avaliação preguiçosa] uma estratégia que adia a avaliação de uma expressão até o seu valor ser necessário e evita repetições por meio de recursos compartilhados \cite{wikipedia-lazy}. Assim, mesmo com um número gigantesco de derivações, o processo de realização de um pacote Nix avalia apenas aquelas que são realmente necessárias.
 		\item[Tudo é uma expressão] não há comandos ou instruções: um arquivo \code{.nix} inteiro é avaliado até produzir um único valor.
 	\end{description}
@@ -73,24 +76,51 @@
 
 \begin{frame}{Expressões e conjuntos de atributos}
 	\begin{columns}[T,onlytextwidth]
-		\begin{column}{0.50\textwidth}
+		\begin{column}{0.48\textwidth}
 			\small\raggedright
-			Em Nix, todo arquivo \code{.nix} é uma única expressão e resulta em um único valor. Esse valor costuma ser um \termo{conjunto de atributos} (\en{attribute set}) --- pares de nome e valor acessados por chave --- mas também pode ser um número, uma string, outro tipo primitivo ou uma derivação.
+			Em Nix, todo arquivo \code{.nix} é uma única expressão e resulta em um único valor. Esse valor costuma ser um \termo{conjunto de atributos} (\en{attribute set}) --- pares de nome e valor acessados por chave --- mas também pode ser um número, uma string, outro tipo primitivo ou uma lista \cite[sec.~Data Types]{nixmanual}.
+
+			\medskip
+
+			Uma \termo{derivação} é simplesmente um conjunto de atributos com uma chave \code{type = "derivation"}.
 		\end{column}
 		\begin{column}{0.46\textwidth}
-			\nixcode{code/attrset}
+			\nixcode{code/attrset}{attrset.nix}
 		\end{column}
 	\end{columns}
+\end{frame}
 
-	\bigskip
-
+\begin{frame}{Funções}
 	\begin{columns}[T,onlytextwidth]
-		\begin{column}{0.50\textwidth}
+		\begin{column}{0.44\textwidth}
 			\small\raggedright
-			O arquivo também pode resultar em uma \termo{função} --- funções são valores como quaisquer outros \cite{nixmanual-language}. Nesse caso, ela recebe um conjunto de atributos como parâmetro para produzir o valor final. Parâmetros podem ter valor padrão (\code{?}).
+			O arquivo também pode resultar em uma \termo{função} --- funções são valores como quaisquer outros \cite[sec.~Nix Language]{nixmanual}. Nesse caso, ela recebe um conjunto de atributos como parâmetro para produzir o valor final. Parâmetros podem ter valor padrão (\code{?}).
+
+			\medskip
+			O padrão \code{\{ pkgs, versao \}:} não declara dois parâmetros: toda função tem a forma \code{padrão: corpo} e recebe exatamente um argumento --- aqui, um único conjunto de atributos que é desestruturado \cite[sec.~Syntax]{nixmanual}.
 		\end{column}
-		\begin{column}{0.46\textwidth}
-			\nixcode{code/funcao}
+		\begin{column}{0.50\textwidth}
+			\nixcode{code/funcao}{funcao.nix}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Aplicação de funções}
+	\small
+	\begin{columns}[T,onlytextwidth]
+		\begin{column}{0.47\textwidth}
+			Uma função de \enquote{duas entradas} é, na verdade, uma função que devolve outra função \cite[sec.~Syntax]{nixmanual}.
+
+			\medskip
+
+			\nixcode{code/curry}{curry.nix}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			Resulta em \code{\{compilador = "gcc-13"; nome = "projeto-raul-2.0"; versao = "2.0"; \}}.
+		
+			\medskip
+		
+			\nixcode{code/uso}{uso.nix}
 		\end{column}
 	\end{columns}
 \end{frame}
