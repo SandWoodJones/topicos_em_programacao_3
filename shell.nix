@@ -49,6 +49,7 @@ pkgs.mkShell {
         fvextra
         tcolorbox
         pgf
+        pgfplots
         environ
         etoolbox
       ]
