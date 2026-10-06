@@ -5,7 +5,7 @@
 \usepackage[backend=biber,style=abnt,accite,extradate]{biblatex}
 \addbibresource{referencias.bib}
 \defbibenvironment{bibliography}{\list{}{\setlength{\leftmargin}{\bibhang}\setlength{\itemindent}{-\leftmargin}\setlength{\itemsep}{0.5em}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}}}{\endlist}{\item}
-\renewcommand*{\bibfont}{\tiny}
+\renewcommand*{\bibfont}{\scriptsize}
 \setbeamertemplate{bibliography item}{}
 \setbeamertemplate{frametitle continuation}[from second]
 \usepackage{fvextra}
@@ -47,11 +47,14 @@
 \newcommand{\en}[1]{\foreignlanguage{english}{\emph{#1}}}
 \newcommand{\termo}[1]{\alert{#1}}
 \newcommand{\code}[1]{\texttt{#1}}
+\newlength{\logobox}\setlength{\logobox}{0.125\textwidth}
+\newcommand{\logoemp}[1]{\begin{minipage}[c]{\logobox}\centering\includegraphics[width=\linewidth,height=13pt,keepaspectratio]{#1}\end{minipage}}
 \newlength{\nixcodelift}\setlength{\nixcodelift}{7pt}
 \newcommand{\nixcode}[2]{\vspace*{-\nixcodelift}\begin{nixbox}{#2}\input{#1.nixtex}\end{nixbox}}
 \newcommand{\nixcodeinline}[2]{\vspace*{3.3pt}\begin{nixbox}{#2}\input{#1.nixtex}\end{nixbox}}
 
 \title{Nix/NixOS}
+\subtitle{\url{https://nixos.org}}
 \author{Raul Rodrigues de Oliveira}
 \date{\today}
 \usetheme{Madrid}
@@ -65,7 +68,7 @@
 	\begin{columns}[c,onlytextwidth]
 		\begin{column}{0.54\textwidth}
 			\footnotesize\raggedright
-			Nix é uma DSL (\en{Domain Specific Language}) usada para declarar \termo{derivações}: instruções precisas de como arquivos existentes são usados para derivar novos arquivos \cite{wikipedia-nix}.
+			Nix é uma DSL (\en{Domain Specific Language}) criada em 2003 usada para declarar \termo{derivações}: instruções precisas de como arquivos existentes são usados para derivar novos arquivos \cite{wikipedia-nix}.
 
 			\medskip
 			Nix também é o gerenciador de pacotes que realiza essas derivações, produzindo resultados concretos (um programa, uma biblioteca, um script de shell, uma imagem baixada da internet). Cada resultado é instalado, via \en{hashing}, em um diretório único e imutável \cite{wikipedia-nix}.
@@ -87,6 +90,68 @@
 		\end{column}
 
 	\end{columns}
+\end{frame}
+
+\begin{frame}{Nix na indústria}
+	\begin{columns}[T,onlytextwidth]
+		\begin{column}{0.52\textwidth}
+			\raggedright
+			Nix é uma \termo{ferramenta de infraestrutura}: entrega \enquote{\en{builds} e implantações declarativas} \cite{nixos-site}. Atua em:
+
+			\medskip
+			\begin{itemize}
+				\item DevOps e CI/CD
+				\item Infraestrutura como código
+				\item Ambientes de desenvolvimento
+				\item Cadeia de suprimentos
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\raggedright
+			Empresas que declaram uso em produção \cite{nix-companies}:
+
+			\medskip
+			\begin{description}
+				\item[Plataformas] Google, Shopify, Supabase, Replit
+				\item[Finanças] Monzo, Mercury, D.~E.~Shaw, JusPay
+				\item[Defesa e redes] Anduril, Arista
+				\item[Suporte] Determinate Systems, Tweag, Cachix
+			\end{description}
+		\end{column}
+	\end{columns}
+
+	\vfill
+	\begin{figure}
+		\caption{Alguns usuários de Nix em produção}
+		\label{fig:logos}
+		\vspace{-4pt}
+		\centering
+		\logoemp{google}\hfill
+		\logoemp{shopify}\hfill
+		\logoemp{replit}\hfill
+		\logoemp{monzo}\hfill
+		\logoemp{deshaw}\hfill
+		\logoemp{anduril}\hfill
+		\logoemp{arista}
+		\par\vspace{2pt}
+		{\tiny Logotipos: Wikimedia Commons}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Estudo de caso: Shopify}
+	\raggedright
+	A Shopify adotou Nix em etapas, ao longo de seis anos.
+
+	\medskip
+	\begin{description}
+		\item[2020] Nix cobre só a máquina do desenvolvedor: o comando \mbox{\code{dev up}} monta as dependências de cada projeto. CI e produção ficam de fora \cite{shopify-devup}.
+		\item[2024] A empresa decide \enquote{construir tudo com Nix: ambientes de desenvolvimento, CI e imagens de produção} \cite{shopify-river}, junto da consolidação dos repositórios em um monorepo.
+		\item[Custo] A transição \enquote{foi dolorosa} e a CI precisou escalar uma ordem de grandeza muito rapidamente \cite{shopify-river}.
+	\end{description}
+
+	\vfill
+	O caso mostra o que \termo{reprodutível} significa na prática: a mesma derivação avaliada na máquina do desenvolvedor é a que vira imagem de produção.
+	\vfill
 \end{frame}
 
 \begin{frame}{A linguagem}
@@ -118,7 +183,7 @@
 
 \begin{frame}{Funções}
 	\begin{columns}[T,onlytextwidth]
-		\begin{column}{0.44\textwidth}
+		\begin{column}{0.48\textwidth}
 			\small\raggedright
 			O arquivo também pode resultar em uma \termo{função} --- funções são valores como quaisquer outros \cite[sec.~Nix Language]{nixmanual}. Nesse caso, ela recebe um conjunto de atributos como parâmetro para produzir o valor final. Parâmetros podem ter valor padrão (\code{?}).
 
@@ -223,6 +288,95 @@
 		\end{column}
 		\begin{column}{0.54\textwidth}
 			\nixcode{code/pacote}{pacote.nix}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{O gerenciador de pacotes}
+	\small\raggedright
+	O gerenciador é o que transforma uma expressão Nix em arquivos no disco. Como cada resultado é endereçado pelo próprio hash, instalar ou atualizar nunca sobrescreve nada: versões diferentes do mesmo pacote coexistem.
+
+	\smallskip
+	No dia a dia, isso aparece em três comandos \cite{nixmanual}:
+
+	\begin{description}
+		\item[\code{nix develop}] abre um shell com as dependências que o projeto declara.
+		\item[\code{nix build}] realiza a derivação e deixa um link \code{result} para o resultado.
+		\item[\code{nix run}] executa um pacote sem o instalar.
+	\end{description}
+
+	\medskip
+	Antes de compilar, Nix consulta um \termo{cache binário} --- por padrão \code{cache.nixos.org}: se o hash de uma derivação já existe no cache, ela é baixada, não refeita \cite{nixmanual}.
+
+	\medskip
+	Ele também empacota para fora. O conjunto \code{dockerTools} gera imagens Docker/OCI \enquote{sem precisar do próprio Docker} \cite{nixpkgs-manual}. A imagem é uma derivação, não um \code{Dockerfile} e inclui apenas o que a derivação referencia, sem distribuição de base.
+\end{frame}
+
+\begin{frame}{A store}
+	\raggedright
+	Os resultados das derivações vivem todos em \code{/nix/store}, cada um em um subdiretório nomeado por um resumo de 20 bytes seguido do nome \cite{nixmanual}. O TeX Live utilizado para compilar estes slides, por exemplo:
+
+	\smallskip
+	{\scriptsize\code{/nix/store/qp3lg40zp9y8j2kk1wwls664kj0ir9j5-texlive-2025-r78234-final-env}}
+
+	\smallskip
+	\begin{description}
+		\item[Imutável] \enquote{uma vez criados, objetos na store não mudam, nem podem mudar qualquer outro objeto que referenciem} \cite{nixmanual}.
+		\item[Endereçada] o resumo vem de tudo que entrou na construção, então entradas diferentes nunca disputam o mesmo caminho e duas versões de uma biblioteca coexistem.
+		\item[Coletada] o que nenhum link alcança --- objetos expirados, não permanentes, obsoletos --- é lixo, removido por \mbox{\code{nix store gc}}.
+	\end{description}
+
+	\smallskip
+	O link \code{result}, o perfil do usuário e cada geração de NixOS são apenas \enquote{ponteiros} para caminhos da store.
+\end{frame}
+
+\begin{frame}{O sistema operacional}
+	\raggedright
+	NixOS aplica o mesmo mecanismo à máquina inteira: o sistema todo é uma derivação, descrita em \termo{módulos}.
+
+	\medskip
+	\begin{description}
+		\item[Aplicar] \code{nixos-rebuild switch} realiza a configuração e a torna o sistema atual \cite{nixos-manual}.
+		\item[Reverter] cada aplicação vira uma \termo{geração} no menu de boot; \code{nixos-rebuild -{}-rollback} volta à anterior \cite{nixos-manual}.
+		\item[Distribuir] \code{nixos-rebuild build-image -{}-image-variant amazon} gera uma AMI; o mesmo mecanismo produz ISO de instalação e imagem de máquina virtual \cite{nixos-manual}.
+	\end{description}
+\end{frame}
+
+\begin{frame}{Módulos}
+	\begin{columns}[T,onlytextwidth]
+		\begin{column}{0.45\textwidth}
+			\small\raggedright
+			Um módulo devolve um conjunto de atributos com três chaves \cite{nixos-wiki-modules}:
+
+			\begin{description}
+				\item[\code{imports}] outros módulos a incluir.
+				\item[\code{options}] ponto de entrada para o usuário final do módulo, possibilitando ajustar o módulo.
+				\item[\code{config}] as mudanças reais ao sistema, normalmente baseadas nas opções configuradas.
+			\end{description}
+
+			Quando múltiplos definem a mesma opção, NixOS funde as definições.
+		\end{column}
+
+		\begin{column}{0.52\textwidth}
+			\nixcode{code/modulo}{modulo.nix}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Flakes}
+	\begin{columns}[T,onlytextwidth]
+		\begin{column}{0.45\textwidth}
+			\small\raggedright
+			Derivações são reprodutíveis, mas o arquivo que as descreve não é? \code{<nixpkgs>} resolve pelo \code{NIX\_PATH} da máquina o que é impuro.
+
+			Um \termo{flake} declara suas entradas e grava em \code{flake.lock} a revisão exata de cada uma. O mesmo \code{flake.nix} avalia igual em qualquer máquina, hoje ou daqui a um ano.
+
+			E como os \code{outputs} seguem um esquema conhecido, \code{nix run github:dono/repo} roda projeto alheio sem clonar nem instalar nada \cite{nixmanual}.
+
+			Desde sua estreia em 2021, flakes continuam em fase experimental, desabilitados por padrão \cite{nixmanual}.
+		\end{column}
+		\begin{column}{0.54\textwidth}
+			\nixcode{code/flakeex}{flake.nix}
 		\end{column}
 	\end{columns}
 \end{frame}
